@@ -1,4 +1,4 @@
-package main
+package bf
 
 import (
 	"flag"
@@ -15,9 +15,17 @@ func main() {
 	if file == "" && txt == "" {
 		fmt.Println("No inputs provided!")
 	} else if txt == "" {
-		ParseFile(file)
+		out, err := ParseFile(file)
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println(out)
 	} else if file == "" {
-		ParseString(txt)
+		out, err := ParseString(txt)
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println(out)
 	} else {
 		fmt.Println("This program can only interpret one file or string of text at a time")
 		fmt.Println("Using both flags is ambiguous, please provide a file OR text to interpret")

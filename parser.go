@@ -1,25 +1,23 @@
-package main
+package bf
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"strings"
 )
 
 const VALID_TOKENS string = "><+-,.[]"
 
-func ParseFile(filepath string) {
-	content, error := os.ReadFile(filepath)
-	if error != nil {
-		fmt.Println("File " + filepath + " not found. Exiting.")
-		return
+func ParseFile(filepath string) (output string, err error) {
+	content, err := os.ReadFile(filepath)
+	if err != nil {
+		return "", err
 	}
 
-	ParseString(string(content))
+	return ParseString(string(content))
 }
 
-func ParseString(input string) {
+func ParseString(input string) (output string, err error) {
 	var instructions []rune
 	for _, v := range []rune(input) {
 		if strings.IndexRune(VALID_TOKENS, v) != -1 {
@@ -27,7 +25,7 @@ func ParseString(input string) {
 		}
 	}
 
-	Interpret(instructions)
+	return Interpret(instructions)
 }
 
 func matching_brace(instructions []rune, instruction_pointer int, find_right bool) (location int) {
@@ -71,15 +69,13 @@ func matching_brace(instructions []rune, instruction_pointer int, find_right boo
 	panic("Matching brace not found!")
 }
 
-func Interpret(instructions []rune) {
+func Interpret(instructions []rune) (output string, err error) {
 
 	reader := bufio.NewReader(os.Stdin)
 
 	cell_pointer := 0
 	instruction_pointer := 0
 	var cells []int
-
-	output := ""
 
 	for instruction_pointer < len(instructions) {
 
@@ -97,12 +93,11 @@ func Interpret(instructions []rune) {
 		case '-':
 			cells[cell_pointer]--
 		case '.':
-			output += string(cells[cell_pointer])
+			output += string(rune(cells[cell_pointer]))
 		case ',':
 			r, _, err := reader.ReadRune()
 			if err != nil {
-				fmt.Println("ERROR READING CHARACTER!")
-				return
+				return "", err
 			}
 			cells[cell_pointer] = int(r)
 		case '[':
@@ -118,6 +113,5 @@ func Interpret(instructions []rune) {
 		instruction_pointer++
 	}
 
-	fmt.Println(output)
 	return
 }
